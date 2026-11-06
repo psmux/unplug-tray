@@ -36,8 +36,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let generation = scanGeneration
         DispatchQueue.global(qos: .userInitiated).async {
             let found = DriveScanner.scan()
-            DispatchQueue.main.async { [weak self] in
-                guard let self, generation == self.scanGeneration else { return }
+            DispatchQueue.main.async {
+                guard generation == self.scanGeneration else { return }
                 self.drives = found
                 self.statusItem.button?.appearsDisabled = found.isEmpty
             }
@@ -132,7 +132,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         setIcon("arrow.triangle.2.circlepath")
         DispatchQueue.global(qos: .userInitiated).async {
             let result = Ejector.eject(d, force: force)
-            DispatchQueue.main.async { [weak self] in self?.finish(d, result) }
+            DispatchQueue.main.async { self.finish(d, result) }
         }
     }
 
@@ -185,9 +185,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         DispatchQueue.global(qos: .userInitiated).async {
             let deadline = Date().addingTimeInterval(10)
             while Date() < deadline, apps.contains(where: { !$0.isTerminated }) { usleep(200_000) }
-            DispatchQueue.main.async { [weak self] in
-                self?.ejecting.remove(d.id)
-                self?.start(d, force: false)
+            DispatchQueue.main.async {
+                self.ejecting.remove(d.id)
+                self.start(d, force: false)
             }
         }
     }
